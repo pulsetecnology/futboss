@@ -112,3 +112,4 @@ backend/dist/
 
 # Environment files (keep .env.example)
 backend/.env
+.env

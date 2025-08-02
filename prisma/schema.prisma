@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String   @unique
+  password    String
+  isGuest     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  lastLogin   DateTime @updatedAt
+  
+  // Relacionamentos
+  fantasyTeams FantasyTeam[]
+  preferences  UserPreferences?
+  
+  @@map("users")
+}
+
+model UserPreferences {
+  id                String @id @default(cuid())
+  userId            String @unique
+  favoriteTeam      String?
+  preferredFormation String @default("4-4-2")
+  notifications     Boolean @default(true)
+  
+  // Relacionamentos
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_preferences")
+}
+
+model Player {
+  id            String         @id @default(cuid())
+  name          String
+  position      PlayerPosition
+  currentTeam   String
+  marketValue   Float
+  currentScore  Float          @default(0)
+  averageScore  Float          @default(0)
+  physicalStatus PhysicalStatus @default(AVAILABLE)
+  photoUrl      String?
+  nationality   String?
+  age           Int?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  // Relacionamentos
+  teamPlayers   TeamPlayer[]
+  playerStats   PlayerStats?
+  club          Club?          @relation(fields: [clubId], references: [id])
+  clubId        String?
+  
+  @@map("players")
+}
+
+model PlayerStats {
+  id           String @id @default(cuid())
+  playerId     String @unique
+  gamesPlayed  Int    @default(0)
+  goals        Int    @default(0)
+  assists      Int    @default(0)
+  yellowCards  Int    @default(0)
+  redCards     Int    @default(0)
+  lastGameRating Float @default(0)
+  
+  // Relacionamentos
+  player Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  
+  @@map("player_stats")
+}
+
+model Club {
+  id       String @id @default(cuid())
+  name     String @unique
+  league   String
+  country  String
+  logoUrl  String?
+  
+  // Relacionamentos
+  players  Player[]
+  
+  @@map("clubs")
+}
+
+model FantasyTeam {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  formation   String   @default("4-4-2")
+  totalValue  Float    @default(0)
+  totalPoints Float    @default(0)
+  budget      Float    @default(100000000) // 100M budget padrão
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacionamentos
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  teamPlayers TeamPlayer[]
+  
+  @@map("fantasy_teams")
+}
+
+model TeamPlayer {
+  id               String @id @default(cuid())
+  fantasyTeamId    String
+  playerId         String
+  position         PlayerPosition
+  acquisitionValue Float
+  currentPoints    Float @default(0)
+  
+  // Relacionamentos
+  fantasyTeam FantasyTeam @relation(fields: [fantasyTeamId], references: [id], onDelete: Cascade)
+  player      Player      @relation(fields: [playerId], references: [id])
+  
+  @@unique([fantasyTeamId, playerId])
+  @@map("team_players")
+}
+
+enum PlayerPosition {
+  GOALKEEPER
+  DEFENDER
+  MIDFIELDER
+  FORWARD
+}
+
+enum PhysicalStatus {
+  AVAILABLE
+  INJURED
+  SUSPENDED
+  DOUBTFUL
+}
