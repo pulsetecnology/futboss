@@ -3,6 +3,7 @@
 - [x] 1. Configurar estrutura base do projeto e dependências
 
 
+
   - Criar estrutura de diretórios frontend (src/, assets/, components/, services/, utils/)
   - Criar estrutura de diretórios backend (controllers/, services/, routes/, middleware/)
   - Configurar Tailwind CSS com paleta de cores personalizada do FutBoss
