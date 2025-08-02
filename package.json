@@ -1,0 +1,41 @@
+{
+  "name": "futboss",
+  "version": "1.0.0",
+  "description": "FutBoss - Fantasy Game de Futebol Mobile-First",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "start:production": "cd backend && npm run start:production",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "prisma:generate": "cd backend && npx prisma generate",
+    "prisma:migrate": "cd backend && npx prisma migrate deploy",
+    "prisma:seed": "cd backend && npx prisma db seed",
+    "prisma:studio": "cd backend && npx prisma studio",
+    "postinstall": "cd backend && npx prisma generate",
+    "railway:build": "npm run build && cd backend && npx prisma migrate deploy",
+    "test": "concurrently \"cd frontend && npm test\" \"cd backend && npm test\""
+  },
+  "keywords": [
+    "fantasy",
+    "football",
+    "soccer",
+    "game",
+    "mobile-first",
+    "nodejs",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "André Silva",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}

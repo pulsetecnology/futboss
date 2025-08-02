@@ -1,25 +1,26 @@
 # Dependencies
-node_modules/
+node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment variables
-.env
+# Environment files
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
 # Build outputs
-dist/
-build/
-.next/
-out/
+.next
+out
+dist
+build
 
-# Database
-*.db
-*.sqlite
+# Development files
+.git
+.gitignore
+README.md
+.kiro
 
 # Logs
 logs
@@ -31,8 +32,8 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
-coverage/
+# Coverage directory
+coverage
 *.lcov
 
 # nyc test coverage
@@ -62,23 +63,9 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# parcel-bundler cache (https://parceljs.org/)
+# parcel-bundler cache
 .cache
 .parcel-cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-
-# Gatsby files
-.cache/
-public
-
-# Storybook build outputs
-.out
-.storybook-out
 
 # Temporary folders
 tmp/
@@ -100,15 +87,10 @@ temp/
 ehthumbs.db
 Thumbs.db
 
-# Prisma
-prisma/migrations/
+# Testing
+coverage/
+.nyc_output/
 
-# Railway
-.railway/
-
-# Production builds
-frontend/dist/
-backend/dist/
-
-# Environment files (keep .env.example)
-backend/.env
+# Storybook build outputs
+.out
+.storybook-out

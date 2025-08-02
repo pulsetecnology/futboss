@@ -1,0 +1,18 @@
+[phases.setup]
+nixPkgs = ['nodejs-18_x', 'npm-9_x']
+
+[phases.install]
+cmds = [
+  'npm ci --only=production',
+  'cd backend && npm ci --only=production',
+  'cd frontend && npm ci --only=production'
+]
+
+[phases.build]
+cmds = [
+  'cd backend && npx prisma generate',
+  'cd frontend && npm run build'
+]
+
+[start]
+cmd = 'npm run start:production'

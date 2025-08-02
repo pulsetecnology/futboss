@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Banco de dados local para desenvolvimento (opcional)
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: futboss-postgres-dev
+    environment:
+      POSTGRES_DB: futboss_dev
+      POSTGRES_USER: futboss
+      POSTGRES_PASSWORD: futboss123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - futboss-network
+
+  # Backend
+  backend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    container_name: futboss-backend-dev
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://futboss:futboss123@postgres-dev:5432/futboss_dev
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    depends_on:
+      - postgres-dev
+    networks:
+      - futboss-network
+    command: npm run dev
+
+  # Frontend (desenvolvimento)
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: ../Dockerfile
+      target: base
+    container_name: futboss-frontend-dev
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    networks:
+      - futboss-network
+    command: npm run dev
+
+volumes:
+  postgres_dev_data:
+
+networks:
+  futboss-network:
+    driver: bridge

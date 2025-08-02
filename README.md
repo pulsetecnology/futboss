@@ -74,27 +74,49 @@ futboss/
 - PostgreSQL (Railway)
 - Git
 
-### Instalação
+### Instalação Local
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/futboss.git
+git clone https://github.com/pulsetecnology/futboss.git
 cd futboss
 
-# Instale as dependências
-npm install
+# Instale todas as dependências
+npm run install:all
 
 # Configure as variáveis de ambiente
-cp .env.example .env
+cp backend/.env.example backend/.env
 
 # Execute as migrações do banco
-npx prisma migrate dev
+npm run prisma:migrate
 
 # Popule o banco com dados iniciais
-npx prisma db seed
+npm run prisma:seed
 
 # Inicie o servidor de desenvolvimento
 npm run dev
 ```
+
+### Deploy no Railway
+
+O projeto está configurado para deploy automático no Railway:
+
+1. **Conecte o repositório** no painel do Railway
+2. **Configure as variáveis de ambiente** (veja `railway.env.example`)
+3. **Deploy automático** acontece a cada push na branch `main`
+
+```bash
+# Deploy manual usando scripts
+./scripts/deploy.sh        # Linux/Mac
+./scripts/deploy.ps1       # Windows PowerShell
+
+# Ou simplesmente
+git push origin main
+```
+
+**URLs após deploy:**
+- App: `https://your-app.railway.app`
+- Health Check: `https://your-app.railway.app/health`
+- API: `https://your-app.railway.app/api/health`
 
 ## 📊 Métricas de Sucesso
 

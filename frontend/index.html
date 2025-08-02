@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutBoss - Fantasy Game de Futebol</title>
+    <meta name="description" content="FutBoss - Seja o chefe do seu time dos sonhos! Fantasy game de futebol com dados reais.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    
+    <!-- Preconnect para Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/src/styles.css">
+    
+    <!-- Meta tags para PWA -->
+    <meta name="theme-color" content="#6B46C1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://futboss.app/">
+    <meta property="og:title" content="FutBoss - Fantasy Game de Futebol">
+    <meta property="og:description" content="Seja o chefe do seu time dos sonhos! Fantasy game de futebol com dados reais.">
+    <meta property="og:image" content="/assets/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://futboss.app/">
+    <meta property="twitter:title" content="FutBoss - Fantasy Game de Futebol">
+    <meta property="twitter:description" content="Seja o chefe do seu time dos sonhos! Fantasy game de futebol com dados reais.">
+    <meta property="twitter:image" content="/assets/og-image.jpg">
+</head>
+<body>
+    <!-- Container principal da aplicação -->
+    <div id="app" x-data="futbossApp()" class="min-h-screen">
+        <!-- Tela de Loading -->
+        <div x-show="loading" class="fixed inset-0 bg-gradient-main flex items-center justify-center z-50">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-futboss-magenta mx-auto mb-4"></div>
+                <p class="text-white text-lg animate-pulse">Carregando FutBoss...</p>
+            </div>
+        </div>
+
+        <!-- Conteúdo principal -->
+        <main x-show="!loading" class="animate-fade-in-up">
+            <!-- As telas serão carregadas dinamicamente aqui -->
+            <div x-html="currentScreen"></div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/main.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+</html>
