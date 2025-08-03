@@ -54,7 +54,10 @@
   - Integrar com endpoints de autenticação do backend
   - _Requisitos: 1.1, 1.2, 1.3, 1.4, 1.7_
 
-- [ ] 6. Desenvolver tela inicial (boas-vindas)
+- [x] 6. Desenvolver tela inicial (boas-vindas)
+
+
+
   - Criar fundo com gradient roxo/preto e sistema de partículas animadas
   - Implementar logo com efeito glow e animação de entrada
   - Adicionar botões "Criar meu fantasy team" e "Selecionar time real"

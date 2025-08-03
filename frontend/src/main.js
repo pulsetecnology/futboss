@@ -6,6 +6,7 @@ import './components/Button.js';
 import './components/PlayerCard.js';
 import './components/Input.js';
 import './components/Loading.js';
+import './components/ParticleSystem.js';
 
 // Importar serviços
 import './services/api.js';
@@ -195,39 +196,107 @@ document.addEventListener('alpine:init', () => {
         // Carregar tela de boas-vindas
         loadWelcomeScreen() {
             this.currentScreen = `
-                <div class="min-h-screen relative overflow-hidden">
-                    <!-- Fundo com partículas (placeholder) -->
-                    <div class="absolute inset-0 bg-gradient-main">
-                        <div class="particles-container"></div>
+                <div class="min-h-screen relative overflow-hidden" id="welcome-screen">
+                    <!-- Fundo com partículas -->
+                    <div class="absolute inset-0 bg-gradient-main" id="particles-container">
+                        <!-- Partículas serão inseridas aqui -->
                     </div>
+                    
+                    <!-- Overlay com gradiente -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40 z-5"></div>
                     
                     <!-- Conteúdo principal -->
                     <div class="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-                        <div class="text-center mb-12">
-                            <h1 class="text-6xl font-bold text-glow animate-float mb-4">FutBoss</h1>
-                            <p class="text-xl text-gray-300 mb-8">Bem-vindo de volta, ${this.user?.username || 'Chefe'}!</p>
+                        <!-- Header com logo e saudação -->
+                        <div class="text-center mb-12 animate-fade-in-up">
+                            <div class="mb-6">
+                                <h1 class="text-6xl md:text-7xl font-bold text-glow animate-float mb-4">
+                                    FutBoss
+                                </h1>
+                                <div class="w-24 h-1 bg-gradient-to-r from-futboss-purple to-futboss-magenta mx-auto rounded-full"></div>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <p class="text-2xl md:text-3xl font-semibold text-white">
+                                    Bem-vindo de volta, 
+                                    <span class="gradient-text">${this.user?.username || 'Chefe'}</span>!
+                                </p>
+                                <p class="text-lg text-gray-300">
+                                    ${this.user?.isGuest ? 'Modo Convidado' : 'Pronto para dominar o campo?'}
+                                </p>
+                            </div>
                         </div>
                         
-                        <div class="space-y-6 w-full max-w-md">
+                        <!-- Botões de ação -->
+                        <div class="space-y-6 w-full max-w-md animate-fade-in-up" style="animation-delay: 0.3s">
                             <button @click="navigateToTeamCreation" 
-                                    class="btn-primary w-full text-lg py-4 animate-pulse-glow">
-                                🏆 Criar meu fantasy team
+                                    class="btn-primary w-full text-lg py-4 animate-pulse-glow group">
+                                <div class="flex items-center justify-center space-x-3">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">🏆</span>
+                                    <span>Criar meu fantasy team</span>
+                                </div>
                             </button>
                             
                             <button @click="navigateToRealTeamSelection" 
-                                    class="btn-secondary w-full text-lg py-4">
-                                ⚽ Selecionar time real
+                                    class="btn-secondary w-full text-lg py-4 group">
+                                <div class="flex items-center justify-center space-x-3">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">⚽</span>
+                                    <span>Selecionar time real</span>
+                                </div>
+                            </button>
+                            
+                            <!-- Botão Meu Time (se tiver time) -->
+                            <button @click="navigateToMyTeam" 
+                                    class="btn-ghost w-full text-lg py-4 group opacity-75 hover:opacity-100">
+                                <div class="flex items-center justify-center space-x-3">
+                                    <span class="text-2xl group-hover:scale-110 transition-transform">👥</span>
+                                    <span>Meu Time</span>
+                                </div>
                             </button>
                         </div>
                         
-                        <footer class="absolute bottom-8 text-center">
-                            <p class="text-futboss-blue-neon animate-pulse">
-                                ⚡ Seja o chefe do seu time dos sonhos! ⚡
-                            </p>
+                        <!-- Stats do usuário (se não for convidado) -->
+                        ${!this.user?.isGuest ? `
+                            <div class="mt-12 animate-fade-in-up" style="animation-delay: 0.6s">
+                                <div class="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-futboss-purple/30">
+                                    <div class="grid grid-cols-3 gap-6 text-center">
+                                        <div>
+                                            <div class="text-2xl font-bold text-futboss-magenta">0</div>
+                                            <div class="text-sm text-gray-400">Times</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold text-futboss-blue-neon">0</div>
+                                            <div class="text-sm text-gray-400">Pontos</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold text-futboss-orange">0</div>
+                                            <div class="text-sm text-gray-400">Ranking</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Footer -->
+                        <footer class="absolute bottom-8 left-0 right-0 text-center animate-fade-in-up" style="animation-delay: 0.9s">
+                            <div class="space-y-2">
+                                <p class="text-futboss-blue-neon animate-pulse font-medium">
+                                    ⚡ Seja o chefe do seu time dos sonhos! ⚡
+                                </p>
+                                <button @click="logout" 
+                                        class="text-gray-400 hover:text-white transition-colors text-sm">
+                                    Sair
+                                </button>
+                            </div>
                         </footer>
                     </div>
                 </div>
             `;
+            
+            // Inicializar sistema de partículas após renderizar
+            setTimeout(() => {
+                this.initParticleSystem();
+            }, 100);
         },
 
         // Dados dos formulários
@@ -360,33 +429,102 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
+        // Sistema de partículas
+        particleSystem: null,
+
+        initParticleSystem() {
+            const container = document.getElementById('particles-container');
+            if (container && !this.particleSystem) {
+                this.particleSystem = new window.ParticleSystem(container, {
+                    particleCount: 60,
+                    particleSize: { min: 1, max: 4 },
+                    particleSpeed: { min: 0.3, max: 1.5 },
+                    connectionDistance: 120,
+                    connectionOpacity: 0.15,
+                    mouseInteraction: true,
+                    mouseRadius: 200
+                });
+                console.log('🌟 Sistema de partículas inicializado');
+            }
+        },
+
+        destroyParticleSystem() {
+            if (this.particleSystem) {
+                this.particleSystem.destroy();
+                this.particleSystem = null;
+            }
+        },
+
         // Navegação
         navigateToTeamCreation() {
             console.log('Navegando para criação de time...');
+            this.destroyParticleSystem();
             // TODO: Implementar tela de criação de time
-            alert('Tela de criação de time em desenvolvimento!');
+            this.showComingSoon('Criação de Time', 'Em breve você poderá criar seu time fantasy dos sonhos!');
         },
 
         navigateToRealTeamSelection() {
             console.log('Navegando para seleção de time real...');
+            this.destroyParticleSystem();
             // TODO: Implementar tela de seleção de time real
-            alert('Tela de seleção de time real em desenvolvimento!');
+            this.showComingSoon('Seleção de Time Real', 'Em breve você poderá escolher jogadores de times reais!');
+        },
+
+        navigateToMyTeam() {
+            console.log('Navegando para meu time...');
+            this.destroyParticleSystem();
+            // TODO: Implementar tela do meu time
+            this.showComingSoon('Meu Time', 'Em breve você poderá visualizar e gerenciar seu time!');
+        },
+
+        // Tela temporária "Em breve"
+        showComingSoon(title, message) {
+            this.currentScreen = `
+                <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-main">
+                    <div class="text-center max-w-md">
+                        <div class="mb-8">
+                            <div class="text-6xl mb-4">🚧</div>
+                            <h2 class="text-3xl font-bold text-white mb-4">${title}</h2>
+                            <p class="text-gray-300 mb-8">${message}</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <button @click="loadWelcomeScreen" class="btn-primary w-full">
+                                🏠 Voltar ao Início
+                            </button>
+                            
+                            <div class="text-sm text-gray-400">
+                                <p>Funcionalidade em desenvolvimento</p>
+                                <p class="text-futboss-blue-neon">Próximas tarefas: 7-10</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         },
 
         // Logout
         async logout() {
             try {
+                // Mostrar loading
+                this.showLoading('Saindo...');
+                
                 // Fazer logout via API
                 await window.ApiService.logout();
             } catch (error) {
                 console.warn('Erro no logout:', error);
             } finally {
+                // Limpar sistema de partículas
+                this.destroyParticleSystem();
+                
                 // Limpar estado local
                 this.user = null;
                 this.isAuthenticated = false;
+                this.showRegister = false;
                 localStorage.removeItem('futboss_user');
                 localStorage.removeItem('futboss_preferences');
                 this.clearForms();
+                this.hideLoading();
                 this.loadLoginScreen();
                 console.log('👋 Logout realizado');
             }
