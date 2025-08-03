@@ -99,19 +99,15 @@ app.get('/api/test-db', async (req, res) => {
 
 // Importar rotas
 const authRoutes = require('./routes/auth');
+const playersRoutes = require('./routes/players');
+const clubsRoutes = require('./routes/clubs');
 
 // Rotas da API
 app.use('/api/auth', authRoutes);
+app.use('/api/players', playersRoutes);
+app.use('/api/clubs', clubsRoutes);
 
 // Rotas em desenvolvimento
-app.use('/api/players', (req, res) => {
-  res.json({ message: 'Rotas de jogadores em desenvolvimento' });
-});
-
-app.use('/api/clubs', (req, res) => {
-  res.json({ message: 'Rotas de clubes em desenvolvimento' });
-});
-
 app.use('/api/fantasy-teams', (req, res) => {
   res.json({ message: 'Rotas de fantasy teams em desenvolvimento' });
 });

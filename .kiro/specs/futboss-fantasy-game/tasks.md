@@ -65,7 +65,10 @@
   - Implementar navegação entre telas
   - _Requisitos: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
-- [ ] 7. Implementar APIs de jogadores e clubes
+- [x] 7. Implementar APIs de jogadores e clubes
+
+
+
   - Criar endpoints GET /api/players com filtros por posição e valor
   - Implementar endpoint GET /api/clubs com busca por nome
   - Criar endpoint GET /api/clubs/:id/players para elenco do clube
