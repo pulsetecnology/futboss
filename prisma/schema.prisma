@@ -41,7 +41,7 @@ model UserPreferences {
 
 model Player {
   id            String         @id @default(cuid())
-  name          String
+  name          String         @unique
   position      PlayerPosition
   currentTeam   String
   marketValue   Float

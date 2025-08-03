@@ -1,6 +1,12 @@
 // Importar CSS
 import './styles.css';
 
+// Importar componentes
+import './components/Button.js';
+import './components/PlayerCard.js';
+import './components/Input.js';
+import './components/Loading.js';
+
 // Configuração principal do FutBoss
 document.addEventListener('alpine:init', () => {
     Alpine.data('futbossApp', () => ({

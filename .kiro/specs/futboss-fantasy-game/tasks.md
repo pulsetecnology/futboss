@@ -11,7 +11,10 @@
   - Instalar dependências do backend (Express, Prisma, bcrypt, jsonwebtoken)
   - _Requisitos: 10.1, 10.2_
 
-- [ ] 2. Configurar banco de dados PostgreSQL com Prisma
+- [x] 2. Configurar banco de dados PostgreSQL com Prisma
+
+
+
   - Configurar conexão com PostgreSQL no Railway usando a URL fornecida
   - Criar schema.prisma com modelos User, Player, Club, FantasyTeam, etc.
   - Executar primeira migração do banco de dados
@@ -19,14 +22,19 @@
   - Executar seed para popular banco com dados de teste
   - _Requisitos: 6.3, 6.4, 8.2_
 
-- [ ] 3. Desenvolver componentes base de interface
+
+
+
+- [x] 3. Desenvolver componentes base de interface
+
   - Criar componente de botão reutilizável com estilos fantasy (gradientes, glow)
   - Implementar componente de card para jogadores com animações hover
   - Criar componente de input com validação visual em tempo real
   - Desenvolver componente de loading com animação temática
   - _Requisitos: 7.3, 7.4, 7.6_
 
-- [ ] 4. Implementar sistema de autenticação backend
+- [-] 4. Implementar sistema de autenticação backend
+
   - Criar endpoints de autenticação (POST /api/auth/register, /api/auth/login)
   - Implementar hash de senhas com bcrypt
   - Criar sistema de JWT tokens para autenticação

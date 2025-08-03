@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutBoss - Demo Componentes</title>
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body class="bg-gradient-main min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-white text-center mb-12 text-glow">
+            🎮 FutBoss - Componentes
+        </h1>
+
+        <!-- Botões -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-semibold text-white mb-6">🔘 Botões</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div id="button-demo" class="space-y-4">
+                    <!-- Botões serão inseridos aqui via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Inputs -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-semibold text-white mb-6">📝 Inputs</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div id="input-demo" class="space-y-4">
+                    <!-- Inputs serão inseridos aqui via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Cards de Jogadores -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-semibold text-white mb-6">⚽ Cards de Jogadores</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="player-cards-demo">
+                    <!-- Cards serão inseridos aqui via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-semibold text-white mb-6">⏳ Loading</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                <div id="loading-demo">
+                    <!-- Loadings serão inseridos aqui via JavaScript -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import './src/main.js';
+        
+        // Demo dos componentes
+        document.addEventListener('DOMContentLoaded', () => {
+            // Demo Botões
+            const buttonDemo = document.getElementById('button-demo');
+            
+            // Botão primário
+            const primaryBtn = window.FutBossButton.create({
+                text: 'Botão Primário',
+                variant: 'primary',
+                size: 'md',
+                icon: '🚀',
+                onClick: () => alert('Botão primário clicado!')
+            });
+            buttonDemo.appendChild(primaryBtn);
+
+            // Botão secundário
+            const secondaryBtn = window.FutBossButton.create({
+                text: 'Botão Secundário',
+                variant: 'secondary',
+                size: 'md',
+                onClick: () => alert('Botão secundário clicado!')
+            });
+            buttonDemo.appendChild(secondaryBtn);
+
+            // Botão com loading
+            const loadingBtn = window.FutBossButton.create({
+                text: 'Botão Loading',
+                variant: 'primary',
+                size: 'md',
+                onClick: function() {
+                    const stopLoading = window.FutBossLoading.createButtonLoading(this, 'Processando...');
+                    setTimeout(stopLoading, 3000);
+                }
+            });
+            buttonDemo.appendChild(loadingBtn);
+
+            // Botão desabilitado
+            const disabledBtn = window.FutBossButton.create({
+                text: 'Botão Desabilitado',
+                variant: 'primary',
+                size: 'md',
+                disabled: true
+            });
+            buttonDemo.appendChild(disabledBtn);
+
+            // Demo Inputs
+            const inputDemo = document.getElementById('input-demo');
+
+            // Input de email
+            const emailInput = window.FutBossInput.create({
+                type: 'email',
+                label: 'E-mail',
+                placeholder: 'Digite seu e-mail',
+                icon: '📧',
+                required: true,
+                validations: ['email'],
+                onChange: (value, validation) => {
+                    console.log('Email:', value, validation);
+                }
+            });
+            inputDemo.appendChild(emailInput);
+
+            // Input de senha
+            const passwordInput = window.FutBossInput.create({
+                type: 'password',
+                label: 'Senha',
+                placeholder: 'Digite sua senha',
+                icon: '🔒',
+                required: true,
+                validations: ['password'],
+                onChange: (value, validation) => {
+                    console.log('Password:', validation);
+                }
+            });
+            inputDemo.appendChild(passwordInput);
+
+            // Input de nome de usuário
+            const usernameInput = window.FutBossInput.create({
+                type: 'text',
+                label: 'Nome de Usuário',
+                placeholder: 'Digite seu nome de usuário',
+                icon: '👤',
+                required: true,
+                validations: ['username'],
+                onChange: (value, validation) => {
+                    console.log('Username:', value, validation);
+                }
+            });
+            inputDemo.appendChild(usernameInput);
+
+            // Input de busca
+            const searchInput = window.FutBossInput.create({
+                type: 'text',
+                label: 'Buscar Jogadores',
+                placeholder: 'Digite o nome do jogador...',
+                icon: '🔍',
+                onChange: (value) => {
+                    console.log('Busca:', value);
+                }
+            });
+            inputDemo.appendChild(searchInput);
+
+            // Demo Cards de Jogadores
+            const playerCardsDemo = document.getElementById('player-cards-demo');
+
+            const players = [
+                {
+                    id: '1',
+                    name: 'Rodrygo',
+                    position: 'FORWARD',
+                    currentTeam: 'Real Madrid',
+                    marketValue: 65000000,
+                    currentScore: 7.9,
+                    averageScore: 7.2,
+                    nationality: 'Brasil',
+                    age: 23
+                },
+                {
+                    id: '2',
+                    name: 'Vinícius Jr.',
+                    position: 'FORWARD',
+                    currentTeam: 'Real Madrid',
+                    marketValue: 120000000,
+                    currentScore: 8.1,
+                    averageScore: 7.8,
+                    nationality: 'Brasil',
+                    age: 24
+                },
+                {
+                    id: '3',
+                    name: 'Jude Bellingham',
+                    position: 'MIDFIELDER',
+                    currentTeam: 'Real Madrid',
+                    marketValue: 150000000,
+                    currentScore: 8.5,
+                    averageScore: 8.2,
+                    nationality: 'Inglaterra',
+                    age: 21
+                }
+            ];
+
+            players.forEach(player => {
+                const card = window.PlayerCard.create(player, {
+                    selectable: true,
+                    onSelect: (playerData, cardElement) => {
+                        const isSelected = cardElement.classList.contains('selected');
+                        window.PlayerCard.setSelected(cardElement, !isSelected);
+                        console.log('Player selecionado:', playerData.name, !isSelected);
+                    },
+                    onView: (playerData) => {
+                        alert(`Visualizando detalhes de ${playerData.name}`);
+                    }
+                });
+                playerCardsDemo.appendChild(card);
+            });
+
+            // Demo Loading
+            const loadingDemo = document.getElementById('loading-demo');
+
+            const loadingTypes = ['spinner', 'dots', 'pulse', 'bars', 'football', 'glow'];
+            
+            loadingTypes.forEach(type => {
+                const loading = window.FutBossLoading.create({
+                    type: type,
+                    size: 'md',
+                    message: type.charAt(0).toUpperCase() + type.slice(1)
+                });
+                loadingDemo.appendChild(loading);
+            });
+
+            // Demo de loading fullscreen
+            const fullscreenBtn = window.FutBossButton.create({
+                text: 'Loading Fullscreen',
+                variant: 'secondary',
+                size: 'sm',
+                onClick: () => {
+                    const fullscreenLoading = window.FutBossLoading.createFullscreen({
+                        type: 'glow',
+                        message: 'Carregando FutBoss...'
+                    });
+                    
+                    setTimeout(() => {
+                        fullscreenLoading.remove();
+                    }, 3000);
+                }
+            });
+            loadingDemo.appendChild(fullscreenBtn);
+
+            console.log('🎮 Demo dos componentes FutBoss carregado!');
+        });
+    </script>
+</body>
+</html>
