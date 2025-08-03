@@ -89,6 +89,7 @@
 
 - [x] 9. Implementar sistema de gerenciamento de orçamento
 
+
   - Criar classe BudgetManager para controle de orçamento do time
   - Implementar cálculo em tempo real do valor total do time
   - Criar componente visual de barra/contador de orçamento

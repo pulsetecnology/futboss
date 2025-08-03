@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutBoss - Teste das APIs de Futebol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8" x-data="apiTester()">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">🏆 FutBoss API Tester</h1>
+            <p class="text-purple-200">Teste das APIs de Futebol Integradas</p>
+        </div>
+
+        <!-- Status das APIs -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">📡 Status das Conexões</h2>
+            <button @click="testConnections()" 
+                    class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg mb-4 transition-colors">
+                🔄 Testar Conectividade
+            </button>
+            
+            <div x-show="connectionStatus" class="grid md:grid-cols-2 gap-4">
+                <div class="bg-white/5 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-white mb-2">API Futebol (Brasil)</h3>
+                    <div x-show="connectionStatus?.apiFutebol?.connected" class="text-green-400">
+                        ✅ Conectada
+                    </div>
+                    <div x-show="connectionStatus?.apiFutebol && !connectionStatus.apiFutebol.connected" class="text-red-400">
+                        ❌ Erro: <span x-text="connectionStatus.apiFutebol.error"></span>
+                    </div>
+                </div>
+                
+                <div class="bg-white/5 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-white mb-2">SportsData API</h3>
+                    <div x-show="connectionStatus?.sportsData?.connected" class="text-green-400">
+                        ✅ Conectada
+                    </div>
+                    <div x-show="connectionStatus?.sportsData && !connectionStatus.sportsData.connected" class="text-red-400">
+                        ❌ Erro: <span x-text="connectionStatus.sportsData.error"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testes das APIs -->
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- API Futebol (Brasil) -->
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6">
+                <h2 class="text-2xl font-bold text-white mb-4">🇧🇷 API Futebol Brasil</h2>
+                
+                <div class="space-y-4">
+                    <button @click="getBrazilianChampionships()" 
+                            class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        📋 Buscar Campeonatos
+                    </button>
+                    
+                    <div x-show="brazilianData.championships" class="bg-white/5 rounded-lg p-4 max-h-60 overflow-y-auto">
+                        <h4 class="text-white font-semibold mb-2">Campeonatos:</h4>
+                        <pre x-text="JSON.stringify(brazilianData.championships, null, 2)" 
+                             class="text-xs text-purple-200 whitespace-pre-wrap"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SportsData API -->
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6">
+                <h2 class="text-2xl font-bold text-white mb-4">🌍 SportsData API</h2>
+                
+                <div class="space-y-4">
+                    <button @click="getInternationalCompetitions()" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        🏆 Buscar Competições
+                    </button>
+                    
+                    <div x-show="sportsData.competitions" class="bg-white/5 rounded-lg p-4 max-h-60 overflow-y-auto">
+                        <h4 class="text-white font-semibold mb-2">Competições (primeiras 5):</h4>
+                        <div class="space-y-2">
+                            <template x-for="competition in sportsData.competitions.slice(0, 5)" :key="competition.CompetitionId">
+                                <div class="bg-white/10 rounded p-2">
+                                    <div class="text-white font-medium" x-text="competition.Name"></div>
+                                    <div class="text-purple-200 text-sm" x-text="competition.AreaName"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <div x-show="sportsData.competitions" class="mt-4">
+                        <select x-model="selectedCompetition" 
+                                class="w-full bg-white/10 text-white rounded-lg px-3 py-2 mb-2">
+                            <option value="">Selecione uma competição</option>
+                            <template x-for="comp in sportsData.competitions.slice(0, 10)" :key="comp.CompetitionId">
+                                <option :value="comp.Name" x-text="comp.Name"></option>
+                            </template>
+                        </select>
+                        
+                        <button @click="getTeamsFromCompetition()" 
+                                :disabled="!selectedCompetition"
+                                class="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            👥 Buscar Times
+                        </button>
+                    </div>
+                    
+                    <div x-show="sportsData.teams" class="bg-white/5 rounded-lg p-4 max-h-60 overflow-y-auto">
+                        <h4 class="text-white font-semibold mb-2">Times:</h4>
+                        <div class="space-y-1">
+                            <template x-for="team in sportsData.teams.slice(0, 10)" :key="team.TeamId">
+                                <div class="text-purple-200 text-sm" x-text="team.Name"></div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentação -->
+        <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 mt-8">
+            <h2 class="text-2xl font-bold text-white mb-4">📚 Endpoints Disponíveis</h2>
+            <button @click="getApiDocs()" 
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg mb-4 transition-colors">
+                📖 Carregar Documentação
+            </button>
+            
+            <div x-show="apiDocs" class="bg-white/5 rounded-lg p-4 max-h-96 overflow-y-auto">
+                <pre x-text="JSON.stringify(apiDocs, null, 2)" 
+                     class="text-xs text-purple-200 whitespace-pre-wrap"></pre>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div x-show="loading" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                <p class="text-gray-700">Carregando...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function apiTester() {
+            return {
+                loading: false,
+                connectionStatus: null,
+                brazilianData: {
+                    championships: null
+                },
+                sportsData: {
+                    competitions: null,
+                    teams: null
+                },
+                selectedCompetition: '',
+                apiDocs: null,
+
+                async testConnections() {
+                    this.loading = true;
+                    try {
+                        const response = await axios.get('/api/football/test-connection');
+                        this.connectionStatus = response.data.data;
+                    } catch (error) {
+                        console.error('Erro ao testar conexões:', error);
+                        alert('Erro ao testar conexões: ' + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async getBrazilianChampionships() {
+                    this.loading = true;
+                    try {
+                        const response = await axios.get('/api/football/br/championships');
+                        this.brazilianData.championships = response.data;
+                    } catch (error) {
+                        console.error('Erro ao buscar campeonatos:', error);
+                        alert('Erro ao buscar campeonatos: ' + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async getInternationalCompetitions() {
+                    this.loading = true;
+                    try {
+                        const response = await axios.get('/api/football/sportsdata/competitions');
+                        this.sportsData.competitions = response.data.data;
+                    } catch (error) {
+                        console.error('Erro ao buscar competições:', error);
+                        alert('Erro ao buscar competições: ' + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async getTeamsFromCompetition() {
+                    if (!this.selectedCompetition) return;
+                    
+                    this.loading = true;
+                    try {
+                        const response = await axios.get(`/api/football/sportsdata/teams/${encodeURIComponent(this.selectedCompetition)}`);
+                        this.sportsData.teams = response.data.data;
+                    } catch (error) {
+                        console.error('Erro ao buscar times:', error);
+                        alert('Erro ao buscar times: ' + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async getApiDocs() {
+                    this.loading = true;
+                    try {
+                        const response = await axios.get('/api/football/docs');
+                        this.apiDocs = response.data;
+                    } catch (error) {
+                        console.error('Erro ao buscar documentação:', error);
+                        alert('Erro ao buscar documentação: ' + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

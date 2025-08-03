@@ -2,7 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const { PrismaClient } = require('@prisma/client');
 require('dotenv').config();
+
+// Inicializar Prisma Client
+const prisma = new PrismaClient();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -64,9 +68,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Importar Prisma Client
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+
 
 // Rota de teste para verificar conexão com banco
 app.get('/api/test-db', async (req, res) => {
@@ -102,12 +104,16 @@ const authRoutes = require('./routes/auth');
 const playersRoutes = require('./routes/players');
 const clubsRoutes = require('./routes/clubs');
 const fantasyTeamsRoutes = require('./routes/fantasyTeams');
+const footballApiRoutes = require('./routes/footballApi');
+const dataSyncRoutes = require('./routes/dataSync');
 
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/players', playersRoutes);
 app.use('/api/clubs', clubsRoutes);
 app.use('/api/fantasy-teams', fantasyTeamsRoutes);
+app.use('/api/football', footballApiRoutes);
+app.use('/api/data-sync', dataSyncRoutes);
 
 // Middleware de tratamento de erros
 app.use((err, req, res, next) => {
