@@ -43,7 +43,10 @@
   - Criar endpoint para login como convidado
   - _Requisitos: 1.1, 1.2, 1.3, 1.4, 1.7_
 
-- [ ] 5. Implementar tela de login/cadastro
+- [x] 5. Implementar tela de login/cadastro
+
+
+
   - Criar layout da tela com logo animado e fundo gradient
   - Implementar formulário de login com campos e-mail/usuário e senha
   - Adicionar botões "Entrar", "Cadastrar" e "Entrar como convidado"
