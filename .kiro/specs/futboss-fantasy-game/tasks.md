@@ -76,7 +76,10 @@
   - Adicionar validação de parâmetros de entrada
   - _Requisitos: 3.1, 3.2, 4.1, 4.2, 4.3_
 
-- [ ] 8. Implementar APIs de fantasy teams
+- [x] 8. Implementar APIs de fantasy teams
+
+
+
   - Criar endpoints CRUD para fantasy teams (GET, POST, PUT, DELETE)
   - Implementar endpoint POST /api/fantasy-teams/:id/players para adicionar jogador
   - Criar endpoint DELETE /api/fantasy-teams/:id/players/:playerId para remover jogador

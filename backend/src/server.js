@@ -101,16 +101,13 @@ app.get('/api/test-db', async (req, res) => {
 const authRoutes = require('./routes/auth');
 const playersRoutes = require('./routes/players');
 const clubsRoutes = require('./routes/clubs');
+const fantasyTeamsRoutes = require('./routes/fantasyTeams');
 
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/players', playersRoutes);
 app.use('/api/clubs', clubsRoutes);
-
-// Rotas em desenvolvimento
-app.use('/api/fantasy-teams', (req, res) => {
-  res.json({ message: 'Rotas de fantasy teams em desenvolvimento' });
-});
+app.use('/api/fantasy-teams', fantasyTeamsRoutes);
 
 // Middleware de tratamento de erros
 app.use((err, req, res, next) => {

@@ -107,6 +107,75 @@ const validateUserPreferences = [
 ];
 
 /**
+ * Validações para fantasy team
+ */
+const validateFantasyTeam = [
+  body('name')
+    .notEmpty()
+    .withMessage('Nome do time é obrigatório')
+    .isLength({ min: 3, max: 50 })
+    .withMessage('Nome deve ter entre 3 e 50 caracteres')
+    .matches(/^[a-zA-Z0-9\s\-_]+$/)
+    .withMessage('Nome pode conter apenas letras, números, espaços, hífens e underscores'),
+    
+  body('formation')
+    .optional()
+    .isIn(['4-4-2', '4-3-3', '3-5-2', '4-2-3-1', '5-3-2', '3-4-3', '4-5-1'])
+    .withMessage('Formação inválida'),
+    
+  body('players')
+    .optional()
+    .isArray()
+    .withMessage('Jogadores deve ser um array'),
+    
+  body('players.*.playerId')
+    .if(body('players').exists())
+    .notEmpty()
+    .withMessage('ID do jogador é obrigatório')
+    .isString()
+    .withMessage('ID do jogador deve ser uma string'),
+    
+  body('players.*.position')
+    .if(body('players').exists())
+    .optional()
+    .isIn(['GOALKEEPER', 'DEFENDER', 'MIDFIELDER', 'FORWARD'])
+    .withMessage('Posição inválida')
+];
+
+/**
+ * Validações para atualização de fantasy team
+ */
+const validateUpdateFantasyTeam = [
+  body('name')
+    .optional()
+    .isLength({ min: 3, max: 50 })
+    .withMessage('Nome deve ter entre 3 e 50 caracteres')
+    .matches(/^[a-zA-Z0-9\s\-_]+$/)
+    .withMessage('Nome pode conter apenas letras, números, espaços, hífens e underscores'),
+    
+  body('formation')
+    .optional()
+    .isIn(['4-4-2', '4-3-3', '3-5-2', '4-2-3-1', '5-3-2', '3-4-3', '4-5-1'])
+    .withMessage('Formação inválida')
+];
+
+/**
+ * Validações para adicionar jogador ao time
+ */
+const validateAddPlayerToTeam = [
+  body('playerId')
+    .notEmpty()
+    .withMessage('ID do jogador é obrigatório')
+    .isString()
+    .withMessage('ID do jogador deve ser uma string'),
+    
+  body('position')
+    .optional()
+    .isIn(['GOALKEEPER', 'DEFENDER', 'MIDFIELDER', 'FORWARD'])
+    .withMessage('Posição inválida')
+];
+
+/**
  * Sanitização de dados de entrada
  */
 const sanitizeInput = (req, res, next) => {
@@ -217,6 +286,9 @@ module.exports = {
   validateUpdateProfile,
   validateChangePassword,
   validateUserPreferences,
+  validateFantasyTeam,
+  validateUpdateFantasyTeam,
+  validateAddPlayerToTeam,
   sanitizeInput,
   validateRateLimit,
   validatePasswordStrength
