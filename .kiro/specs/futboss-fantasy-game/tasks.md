@@ -95,7 +95,10 @@
   - Adicionar alertas visuais quando orçamento é excedido
   - _Requisitos: 3.5, 3.6, 3.7_
 
-- [ ] 10. Desenvolver tela de criação de time fantasy
+- [x] 10. Desenvolver tela de criação de time fantasy
+
+
+
   - Criar layout da tela com seção de jogadores disponíveis
   - Implementar cards de jogadores com informações (nome, posição, valor, pontuação)
   - Adicionar sistema de filtros por posição e valor

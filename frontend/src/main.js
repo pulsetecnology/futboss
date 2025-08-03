@@ -22,6 +22,26 @@ document.addEventListener('alpine:init', () => {
         showRegister: false,
         errorMessage: '',
 
+        // Estado da criação de time
+        teamCreation: {
+            step: 1, // 1: Nome e formação, 2: Seleção de jogadores, 3: Revisão
+            teamName: '',
+            formation: '4-4-2',
+            selectedPlayers: [],
+            availablePlayers: [],
+            budget: 100000000, // 100M
+            usedBudget: 0,
+            filters: {
+                position: '',
+                search: '',
+                minValue: '',
+                maxValue: '',
+                sortBy: 'currentScore',
+                sortOrder: 'desc'
+            },
+            loading: false
+        },
+
         // Inicialização da aplicação
         init() {
             console.log('🚀 FutBoss iniciando...');
@@ -459,8 +479,7 @@ document.addEventListener('alpine:init', () => {
         navigateToTeamCreation() {
             console.log('Navegando para criação de time...');
             this.destroyParticleSystem();
-            // TODO: Implementar tela de criação de time
-            this.showComingSoon('Criação de Time', 'Em breve você poderá criar seu time fantasy dos sonhos!');
+            this.loadTeamCreationScreen();
         },
 
         navigateToRealTeamSelection() {
@@ -475,6 +494,294 @@ document.addEventListener('alpine:init', () => {
             this.destroyParticleSystem();
             // TODO: Implementar tela do meu time
             this.showComingSoon('Meu Time', 'Em breve você poderá visualizar e gerenciar seu time!');
+        },
+
+        // Tela de criação de time
+        loadTeamCreationScreen() {
+            this.resetTeamCreation();
+            this.currentScreen = `
+                <div class="min-h-screen bg-gradient-main p-4">
+                    <div class="max-w-6xl mx-auto">
+                        <!-- Header -->
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center space-x-4">
+                                <button @click="loadWelcomeScreen" 
+                                        class="text-gray-400 hover:text-white transition-colors">
+                                    ← Voltar
+                                </button>
+                                <h1 class="text-3xl font-bold text-white">Criar Fantasy Team</h1>
+                            </div>
+                            
+                            <!-- Progress -->
+                            <div class="flex items-center space-x-2">
+                                <div class="flex space-x-2">
+                                    <div :class="teamCreation.step >= 1 ? 'bg-futboss-purple' : 'bg-gray-600'" 
+                                         class="w-3 h-3 rounded-full"></div>
+                                    <div :class="teamCreation.step >= 2 ? 'bg-futboss-purple' : 'bg-gray-600'" 
+                                         class="w-3 h-3 rounded-full"></div>
+                                    <div :class="teamCreation.step >= 3 ? 'bg-futboss-purple' : 'bg-gray-600'" 
+                                         class="w-3 h-3 rounded-full"></div>
+                                </div>
+                                <span class="text-gray-400 text-sm">Passo <span x-text="teamCreation.step"></span> de 3</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 1: Nome e Formação -->
+                        <div x-show="teamCreation.step === 1" class="animate-fade-in-up">
+                            <div class="max-w-2xl mx-auto">
+                                <div class="bg-gradient-card rounded-2xl p-8 border border-futboss-purple/30">
+                                    <h2 class="text-2xl font-bold text-white mb-6 text-center">
+                                        🏆 Configure seu Time
+                                    </h2>
+                                    
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2 text-gray-300">Nome do Time</label>
+                                            <input type="text" x-model="teamCreation.teamName" 
+                                                   class="input-field w-full" 
+                                                   placeholder="Digite o nome do seu time"
+                                                   maxlength="50">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2 text-gray-300">Formação</label>
+                                            <select x-model="teamCreation.formation" class="input-field w-full">
+                                                <option value="4-4-2">4-4-2 (Clássica)</option>
+                                                <option value="4-3-3">4-3-3 (Ofensiva)</option>
+                                                <option value="3-5-2">3-5-2 (Meio-campo)</option>
+                                                <option value="4-2-3-1">4-2-3-1 (Moderna)</option>
+                                                <option value="5-3-2">5-3-2 (Defensiva)</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="bg-black/30 rounded-lg p-4">
+                                            <h3 class="text-lg font-semibold text-white mb-2">Orçamento</h3>
+                                            <div class="text-3xl font-bold text-futboss-magenta">
+                                                €100M
+                                            </div>
+                                            <p class="text-gray-400 text-sm mt-1">
+                                                Monte seu time dos sonhos com este orçamento
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-8 flex justify-end">
+                                        <button @click="nextStep" 
+                                                :disabled="!teamCreation.teamName.trim()"
+                                                class="btn-primary px-8 py-3">
+                                            Próximo: Selecionar Jogadores →
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Seleção de Jogadores -->
+                        <div x-show="teamCreation.step === 2" class="animate-fade-in-up">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <!-- Filtros e Lista de Jogadores -->
+                                <div class="lg:col-span-2">
+                                    <div class="bg-gradient-card rounded-2xl p-6 border border-futboss-purple/30">
+                                        <h2 class="text-xl font-bold text-white mb-4">Jogadores Disponíveis</h2>
+                                        
+                                        <!-- Filtros -->
+                                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                            <select x-model="teamCreation.filters.position" 
+                                                    @change="loadPlayers"
+                                                    class="input-field">
+                                                <option value="">Todas as posições</option>
+                                                <option value="GOALKEEPER">Goleiro</option>
+                                                <option value="DEFENDER">Defensor</option>
+                                                <option value="MIDFIELDER">Meio-campo</option>
+                                                <option value="FORWARD">Atacante</option>
+                                            </select>
+                                            
+                                            <input type="text" x-model="teamCreation.filters.search" 
+                                                   @input="debounceLoadPlayers"
+                                                   class="input-field" 
+                                                   placeholder="Buscar jogador...">
+                                            
+                                            <select x-model="teamCreation.filters.sortBy" 
+                                                    @change="loadPlayers"
+                                                    class="input-field">
+                                                <option value="currentScore">Pontuação</option>
+                                                <option value="marketValue">Valor</option>
+                                                <option value="name">Nome</option>
+                                            </select>
+                                            
+                                            <select x-model="teamCreation.filters.sortOrder" 
+                                                    @change="loadPlayers"
+                                                    class="input-field">
+                                                <option value="desc">Maior → Menor</option>
+                                                <option value="asc">Menor → Maior</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Lista de Jogadores -->
+                                        <div class="space-y-4 max-h-96 overflow-y-auto" id="players-list">
+                                            <div x-show="teamCreation.loading" class="text-center py-8">
+                                                <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-futboss-purple mx-auto"></div>
+                                                <p class="text-gray-400 mt-2">Carregando jogadores...</p>
+                                            </div>
+                                            
+                                            <div x-show="!teamCreation.loading && teamCreation.availablePlayers.length === 0" 
+                                                 class="text-center py-8 text-gray-400">
+                                                Nenhum jogador encontrado
+                                            </div>
+                                            
+                                            <!-- Jogadores serão inseridos aqui via JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Meu Time -->
+                                <div class="lg:col-span-1">
+                                    <div class="bg-gradient-card rounded-2xl p-6 border border-futboss-purple/30 sticky top-4">
+                                        <h2 class="text-xl font-bold text-white mb-4">
+                                            <span x-text="teamCreation.teamName"></span>
+                                        </h2>
+                                        
+                                        <!-- Orçamento -->
+                                        <div class="mb-6">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="text-gray-300">Orçamento</span>
+                                                <span class="text-white font-semibold" x-text="formatCurrency(teamCreation.budget - teamCreation.usedBudget)"></span>
+                                            </div>
+                                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                                <div class="bg-gradient-to-r from-futboss-purple to-futboss-magenta h-2 rounded-full transition-all duration-300"
+                                                     :style="'width: ' + (teamCreation.usedBudget / teamCreation.budget * 100) + '%'"></div>
+                                            </div>
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                Usado: <span x-text="formatCurrency(teamCreation.usedBudget)"></span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Jogadores Selecionados -->
+                                        <div class="space-y-2 mb-6 max-h-64 overflow-y-auto">
+                                            <template x-for="player in teamCreation.selectedPlayers" :key="player.id">
+                                                <div class="flex items-center justify-between bg-black/30 rounded-lg p-3">
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="text-white font-medium truncate" x-text="player.name"></div>
+                                                        <div class="text-xs text-gray-400" x-text="getPositionText(player.position)"></div>
+                                                    </div>
+                                                    <div class="text-right ml-2">
+                                                        <div class="text-sm text-futboss-blue-neon" x-text="formatCurrency(player.marketValue)"></div>
+                                                        <button @click="removePlayerFromTeam(player)" 
+                                                                class="text-red-400 hover:text-red-300 text-xs">
+                                                            Remover
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            
+                                            <div x-show="teamCreation.selectedPlayers.length === 0" 
+                                                 class="text-center py-8 text-gray-400">
+                                                Nenhum jogador selecionado
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Botões -->
+                                        <div class="space-y-3">
+                                            <button @click="prevStep" class="btn-secondary w-full">
+                                                ← Voltar
+                                            </button>
+                                            <button @click="nextStep" 
+                                                    :disabled="teamCreation.selectedPlayers.length === 0"
+                                                    class="btn-primary w-full">
+                                                Revisar Time →
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Revisão e Criação -->
+                        <div x-show="teamCreation.step === 3" class="animate-fade-in-up">
+                            <div class="max-w-4xl mx-auto">
+                                <div class="bg-gradient-card rounded-2xl p-8 border border-futboss-purple/30">
+                                    <h2 class="text-2xl font-bold text-white mb-6 text-center">
+                                        ✅ Revisar seu Time
+                                    </h2>
+                                    
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        <!-- Informações do Time -->
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-white mb-4">Informações</h3>
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Nome:</span>
+                                                    <span class="text-white font-medium" x-text="teamCreation.teamName"></span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Formação:</span>
+                                                    <span class="text-white font-medium" x-text="teamCreation.formation"></span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Jogadores:</span>
+                                                    <span class="text-white font-medium" x-text="teamCreation.selectedPlayers.length"></span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Valor Total:</span>
+                                                    <span class="text-futboss-magenta font-bold" x-text="formatCurrency(teamCreation.usedBudget)"></span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-300">Orçamento Restante:</span>
+                                                    <span class="text-futboss-blue-neon font-bold" x-text="formatCurrency(teamCreation.budget - teamCreation.usedBudget)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Lista de Jogadores -->
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-white mb-4">Elenco</h3>
+                                            <div class="space-y-2 max-h-64 overflow-y-auto">
+                                                <template x-for="player in teamCreation.selectedPlayers" :key="player.id">
+                                                    <div class="flex items-center justify-between bg-black/30 rounded-lg p-3">
+                                                        <div class="flex items-center space-x-3">
+                                                            <div class="w-8 h-8 bg-futboss-purple rounded-full flex items-center justify-center text-xs font-bold">
+                                                                <span x-text="getPositionAbbr(player.position)"></span>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-white font-medium" x-text="player.name"></div>
+                                                                <div class="text-xs text-gray-400" x-text="player.currentTeam"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <div class="text-sm text-futboss-blue-neon" x-text="formatCurrency(player.marketValue)"></div>
+                                                            <div class="text-xs text-gray-400">Nota: <span x-text="player.currentScore.toFixed(1)"></span></div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-8 flex justify-between">
+                                        <button @click="prevStep" class="btn-secondary px-8 py-3">
+                                            ← Voltar
+                                        </button>
+                                        <button @click="createTeam" 
+                                                :disabled="teamCreation.loading"
+                                                class="btn-primary px-8 py-3">
+                                            <span x-show="!teamCreation.loading">🏆 Criar Time</span>
+                                            <span x-show="teamCreation.loading" class="flex items-center">
+                                                <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                                                Criando...
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Carregar jogadores iniciais
+            setTimeout(() => {
+                this.loadPlayers();
+            }, 100);
         },
 
         // Tela temporária "Em breve"
@@ -495,7 +802,7 @@ document.addEventListener('alpine:init', () => {
                             
                             <div class="text-sm text-gray-400">
                                 <p>Funcionalidade em desenvolvimento</p>
-                                <p class="text-futboss-blue-neon">Próximas tarefas: 7-10</p>
+                                <p class="text-futboss-blue-neon">Próximas tarefas: 9, 11-21</p>
                             </div>
                         </div>
                     </div>
@@ -554,6 +861,226 @@ document.addEventListener('alpine:init', () => {
         clearForms() {
             this.loginForm = { email: '', password: '' };
             this.registerForm = { email: '', username: '', password: '', confirmPassword: '' };
+        },
+
+        // Funções da criação de time
+        resetTeamCreation() {
+            this.teamCreation = {
+                step: 1,
+                teamName: '',
+                formation: '4-4-2',
+                selectedPlayers: [],
+                availablePlayers: [],
+                budget: 100000000,
+                usedBudget: 0,
+                filters: {
+                    position: '',
+                    search: '',
+                    minValue: '',
+                    maxValue: '',
+                    sortBy: 'currentScore',
+                    sortOrder: 'desc'
+                },
+                loading: false
+            };
+        },
+
+        nextStep() {
+            if (this.teamCreation.step < 3) {
+                this.teamCreation.step++;
+            }
+        },
+
+        prevStep() {
+            if (this.teamCreation.step > 1) {
+                this.teamCreation.step--;
+            }
+        },
+
+        async loadPlayers() {
+            try {
+                this.teamCreation.loading = true;
+                
+                const filters = {
+                    ...this.teamCreation.filters,
+                    limit: 50
+                };
+                
+                // Remover filtros vazios
+                Object.keys(filters).forEach(key => {
+                    if (!filters[key]) delete filters[key];
+                });
+                
+                const response = await window.ApiService.getPlayers(filters);
+                
+                if (response.success) {
+                    this.teamCreation.availablePlayers = response.data.players;
+                    this.renderPlayersList();
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar jogadores:', error);
+                this.showError('Erro ao carregar jogadores');
+            } finally {
+                this.teamCreation.loading = false;
+            }
+        },
+
+        debounceLoadPlayers() {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+                this.loadPlayers();
+            }, 500);
+        },
+
+        renderPlayersList() {
+            const container = document.getElementById('players-list');
+            if (!container) return;
+            
+            // Limpar loading e mensagens
+            const loadingElements = container.querySelectorAll('.animate-spin, .text-center');
+            loadingElements.forEach(el => el.remove());
+            
+            // Renderizar jogadores
+            this.teamCreation.availablePlayers.forEach(player => {
+                const isSelected = this.teamCreation.selectedPlayers.some(p => p.id === player.id);
+                const canAfford = (this.teamCreation.usedBudget + player.marketValue) <= this.teamCreation.budget;
+                
+                const playerCard = window.PlayerCard.create(player, {
+                    selectable: !isSelected && canAfford,
+                    selected: isSelected,
+                    size: 'sm',
+                    onSelect: (playerData) => {
+                        if (!isSelected && canAfford) {
+                            this.addPlayerToTeam(playerData);
+                        }
+                    },
+                    onView: (playerData) => {
+                        this.showPlayerDetails(playerData);
+                    }
+                });
+                
+                // Adicionar indicador de orçamento
+                if (!canAfford && !isSelected) {
+                    playerCard.classList.add('opacity-50');
+                    const budgetWarning = document.createElement('div');
+                    budgetWarning.className = 'absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded';
+                    budgetWarning.textContent = 'Sem orçamento';
+                    playerCard.querySelector('.player-card-inner').appendChild(budgetWarning);
+                }
+                
+                container.appendChild(playerCard);
+            });
+        },
+
+        addPlayerToTeam(player) {
+            const newUsedBudget = this.teamCreation.usedBudget + player.marketValue;
+            
+            if (newUsedBudget > this.teamCreation.budget) {
+                this.showError('Orçamento insuficiente para este jogador');
+                return;
+            }
+            
+            if (this.teamCreation.selectedPlayers.some(p => p.id === player.id)) {
+                this.showError('Jogador já está no time');
+                return;
+            }
+            
+            this.teamCreation.selectedPlayers.push(player);
+            this.teamCreation.usedBudget = newUsedBudget;
+            
+            // Re-renderizar lista para atualizar estados
+            this.renderPlayersList();
+        },
+
+        removePlayerFromTeam(player) {
+            const index = this.teamCreation.selectedPlayers.findIndex(p => p.id === player.id);
+            if (index > -1) {
+                this.teamCreation.selectedPlayers.splice(index, 1);
+                this.teamCreation.usedBudget -= player.marketValue;
+                
+                // Re-renderizar lista para atualizar estados
+                this.renderPlayersList();
+            }
+        },
+
+        async createTeam() {
+            try {
+                this.teamCreation.loading = true;
+                
+                const teamData = {
+                    name: this.teamCreation.teamName,
+                    formation: this.teamCreation.formation,
+                    players: this.teamCreation.selectedPlayers.map(player => ({
+                        playerId: player.id,
+                        position: player.position
+                    }))
+                };
+                
+                const response = await window.ApiService.createFantasyTeam(teamData);
+                
+                if (response.success) {
+                    this.showSuccess('Time criado com sucesso!');
+                    setTimeout(() => {
+                        this.loadWelcomeScreen();
+                    }, 2000);
+                } else {
+                    throw new Error(response.message || 'Erro ao criar time');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao criar time:', error);
+                this.showError(error.message || 'Erro ao criar time');
+            } finally {
+                this.teamCreation.loading = false;
+            }
+        },
+
+        showPlayerDetails(player) {
+            // TODO: Implementar modal de detalhes do jogador
+            alert(`Detalhes de ${player.name}\nPosição: ${this.getPositionText(player.position)}\nTime: ${player.currentTeam}\nValor: ${this.formatCurrency(player.marketValue)}\nNota: ${player.currentScore.toFixed(1)}`);
+        },
+
+        showSuccess(message) {
+            // Criar notificação de sucesso
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        },
+
+        // Utilitários
+        formatCurrency(value) {
+            if (value >= 1000000) {
+                return `€${(value / 1000000).toFixed(1)}M`;
+            } else if (value >= 1000) {
+                return `€${(value / 1000).toFixed(0)}K`;
+            }
+            return `€${value}`;
+        },
+
+        getPositionText(position) {
+            const positions = {
+                'GOALKEEPER': 'Goleiro',
+                'DEFENDER': 'Defensor',
+                'MIDFIELDER': 'Meio-campo',
+                'FORWARD': 'Atacante'
+            };
+            return positions[position] || position;
+        },
+
+        getPositionAbbr(position) {
+            const positions = {
+                'GOALKEEPER': 'GOL',
+                'DEFENDER': 'DEF',
+                'MIDFIELDER': 'MEI',
+                'FORWARD': 'ATA'
+            };
+            return positions[position] || position;
         }
     }));
 });
