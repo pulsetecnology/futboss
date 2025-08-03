@@ -33,7 +33,8 @@
   - Desenvolver componente de loading com animação temática
   - _Requisitos: 7.3, 7.4, 7.6_
 
-- [-] 4. Implementar sistema de autenticação backend
+- [x] 4. Implementar sistema de autenticação backend
+
 
   - Criar endpoints de autenticação (POST /api/auth/register, /api/auth/login)
   - Implementar hash de senhas com bcrypt

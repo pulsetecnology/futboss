@@ -64,14 +64,28 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Importar Prisma Client
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 // Rota de teste para verificar conexão com banco
 app.get('/api/test-db', async (req, res) => {
   try {
-    // TODO: Implementar teste de conexão com Prisma
+    // Testar conexão com Prisma
+    await prisma.$connect();
+    const userCount = await prisma.user.count();
+    const playerCount = await prisma.player.count();
+    const clubCount = await prisma.club.count();
+    
     res.json({
       status: 'OK',
       message: 'Conexão com banco de dados OK',
-      database: 'PostgreSQL (Railway)'
+      database: 'PostgreSQL (Railway)',
+      stats: {
+        users: userCount,
+        players: playerCount,
+        clubs: clubCount
+      }
     });
   } catch (error) {
     console.error('Erro ao conectar com banco:', error);
@@ -83,11 +97,13 @@ app.get('/api/test-db', async (req, res) => {
   }
 });
 
-// Rotas da API (serão implementadas nas próximas tarefas)
-app.use('/api/auth', (req, res) => {
-  res.json({ message: 'Rotas de autenticação em desenvolvimento' });
-});
+// Importar rotas
+const authRoutes = require('./routes/auth');
 
+// Rotas da API
+app.use('/api/auth', authRoutes);
+
+// Rotas em desenvolvimento
 app.use('/api/players', (req, res) => {
   res.json({ message: 'Rotas de jogadores em desenvolvimento' });
 });
